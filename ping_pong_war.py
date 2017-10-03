@@ -1,9 +1,24 @@
 import arcade
 
+from models import World
 from models import Player
 
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
+
+class ModelSprite(arcade.Sprite):
+    def __init__(self, *args, **kwargs):
+        self.model = kwargs.pop('model', None)
+
+        super().__init__(*args, **kwargs)
+
+    def sync_with_model(self):
+        if self.model:
+            self.set_position(self.model.x, self.model.y)
+
+    def draw(self):
+        self.sync_with_model()
+        super().draw()
 
 class PingPongWarWindow(arcade.Window):
     def __init__(self, width, height):
@@ -11,11 +26,12 @@ class PingPongWarWindow(arcade.Window):
 
         arcade.set_background_color(arcade.color.BLACK)
         
-        self.player1 = Player(20, 300)
-        self.player1_sprite = arcade.Sprite('images/Player1.png')
-        
-        self.player2 = Player(580, 300)
-        self.player2_sprite = arcade.Sprite('images/Player2.png')
+        self.world = World(width, height)
+
+        self.player1_sprite = ModelSprite('images/Player1.png',
+                                          model=self.world.player1)
+        self.player2_sprite = ModelSprite('images/Player2.png',
+                                          model=self.world.player2)
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -27,14 +43,7 @@ class PingPongWarWindow(arcade.Window):
         self.player2_sprite.draw()
 
     def update(self, delta):
-        player1 = self.player1
-        player2 = self.player2
-
-        player1.update(delta)
-        player2.update(delta)
-
-        self.player1_sprite.set_position(player1.x, player1.y)
-        self.player2_sprite.set_position(player2.x, player2.y)
+        self.world.update(delta)
 
 def main():
     window = PingPongWarWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
