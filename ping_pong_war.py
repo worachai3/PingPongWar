@@ -1,4 +1,5 @@
 import arcade
+import arcade.key
 
 from models import World
 from models import Player
