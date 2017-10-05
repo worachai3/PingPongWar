@@ -33,6 +33,8 @@ class PingPongWarWindow(arcade.Window):
                                           model=self.world.player1)
         self.player2_sprite = ModelSprite('images/Player2.png',
                                           model=self.world.player2)
+        self.ball_sprite = ModelSprite('images/Ball.png',
+                                       model=self.world.ball)
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -42,6 +44,7 @@ class PingPongWarWindow(arcade.Window):
 
         self.player1_sprite.draw()
         self.player2_sprite.draw()
+        self.ball_sprite.draw()
 
     def update(self, delta):
         self.world.update(delta)
