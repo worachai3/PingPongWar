@@ -4,7 +4,7 @@ import arcade.key
 from models import World
 from models import Player
 
-SCREEN_WIDTH = 600
+SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 class ModelSprite(arcade.Sprite):
@@ -38,6 +38,9 @@ class PingPongWarWindow(arcade.Window):
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
+    
+    def on_key_release(self, key, key_modifiers):
+        self.world.on_key_release(key, key_modifiers)
 
     def on_draw(self):
         arcade.start_render()
