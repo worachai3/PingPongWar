@@ -84,8 +84,10 @@ class Player:
 
     def update(self, delta):
         self.y += self.speed*self.v
-        if self.y >= 600 or self.y <= 0:
-            self.v = 0
+        if self.y >= 600:
+            self.y = 0
+        elif self.y <= 0:
+            self.y = 600
 
     def move(self, direction):
         if direction == 'UP':
