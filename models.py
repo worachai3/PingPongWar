@@ -22,14 +22,24 @@ class BouncingObject:
         self.x += self.speed*self.vx
         self.y += self.speed*self.vy
 
-        if self.x >= self.world.width or self.x <= 0:
+        if self.x+self.HIT_BOX_X >= self.world.width or self.x-self.HIT_BOX_X <= 0:
             self.x = self.world.width/2
             self.y = randint(1, self.world.height-1)
-        if self.y >= self.world.height or self.y <= 0:
+        if self.y+self.HIT_BOX_Y >= self.world.height or self.y-self.HIT_BOX_Y <= 0:
             self.vy *= -1
 
     def hit(self, other, hit_size_x, hit_size_y):
         return (abs(self.x - other.x) <= hit_size_x) and (abs(self.y - other.y) <= hit_size_y)
+
+class Potions(BouncingObject):
+    def __init__(self, world, x, y, vx, vy, speed, potion_type):
+        self.world = world
+        self.x = x
+        self.y = y
+        self.vx = vx
+        self.vy = vy
+        self.speed = speed
+        self.potion_type = potion_type
 
 class World:
     def __init__(self, width, height):
@@ -39,30 +49,30 @@ class World:
         self.player1 = Player(self, 20, height/2, 0, 5)
         self.player2 = Player(self, width-20, height/2, 0, 5)
 
-        self.ball = Ball(self, width/2, randint(0,width), randint(0,1), randint(0,1), 3 )
+        self.ball = Ball(self, width/2, randint(0,width), randint(0,1), randint(0,1), 7)
+
+#        self.potion_list.append(Potions())
 
     def update(self, delta):
         self.player1.update(delta)
         self.player2.update(delta)
 
         self.ball.update(delta)
-#        if randint(1,10) <= 1:
-#            self.potion = Potions(self, self.width/2, randint(0,self.height), randint(0,1))
 
     def on_key_press(self, key, key_modifiers):
         print(key)
-        if key == arcade.key.W and self.player1.y < 600:
+        if key == arcade.key.W and self.player1.y+Player.HIT_BOX_Y < self.height:
             print("p1 up")
             self.player1.move('UP')
-        elif key == arcade.key.S and self.player1.y > 0:
+        elif key == arcade.key.S and self.player1.y-Player.HIT_BOX_Y > 0:
             print("p1 down")
             self.player1.move('DOWN')
         else:
             pass
-        if key == arcade.key.UP and self.player2.y < 600:
+        if key == arcade.key.UP and self.player2.y+Player.HIT_BOX_Y < self.height:
             print("p2 up")
             self.player2.move('UP')
-        elif key == arcade.key.DOWN and self.player2.y > 0:
+        elif key == arcade.key.DOWN and self.player2.y-Player.HIT_BOX_Y > 0:
             print("p2 down")
             self.player2.move('DOWN')
         else:
@@ -95,14 +105,22 @@ class Player:
         self.y = y
         self.v = v
         self.speed = speed
+        self.hit_box_x = self.HIT_BOX_X
+        self.hit_box_y = self.HIT_BOX_Y
 
     def update(self, delta):
         self.y += self.speed*self.v
+        if self.y+self.hit_box_y >= self.world.height:
+            self.y = self.world.height-self.hit_box_y
+        elif self.y-self.hit_box_y <= 0:
+            self.y = self.hit_box_y
+        '''
         if self.y >= self.world.height:
             self.y = 0
         elif self.y <= 0:
             self.y = self.world.height
         #print('Player:{} {}'.format(self.x, self.y))
+        '''
 
     def move(self, direction):
         if direction == 'UP':

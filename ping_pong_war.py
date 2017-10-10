@@ -1,8 +1,7 @@
 import arcade
 import arcade.key
 
-from models import World
-from models import Player
+from models import World, Player, Potions
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
@@ -35,6 +34,8 @@ class PingPongWarWindow(arcade.Window):
                                           model=self.world.player2)
         self.ball_sprite = ModelSprite('images/Ball.png',
                                        model=self.world.ball)
+#        self.potion_sprite_list = ModelSprite('images/l_potion.png',
+#                                              model=self.world.l_potion)
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
