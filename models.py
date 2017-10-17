@@ -267,11 +267,15 @@ class Ball(arcade.Sprite):
             if self.world.player2.score < 15:
                 print('Player1 Score: {}    Player2 Score: {}'.format(self.world.player1.score, self.world.player2.score))
                 self.respawn(2)
+            else:
+                self.kill()
         if self.center_x+self.hit_box_x >= self.world.width:
             self.world.player1.score += 1
             if self.world.player1.score < 15:
                 self.respawn(1)
                 print('Player1 Score: {}    Player2 Score: {}'.format(self.world.player1.score, self.world.player2.score))
+            else:
+                self.kill()
 
 
         # Bounce (wall)

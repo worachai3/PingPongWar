@@ -35,7 +35,9 @@ class GameWindow(arcade.Window):
         arcade.start_render()
 
         self.all_sprites_list.draw()
-        #output = f"Score: {self.score}"
+        output = f"Player1: {self.world.player1.score}  Player2: {self.world.player2.score}"
+        self.score_text = arcade.create_text(output, arcade.color.WHITE,  14)
+        arcade.render_text(self. score_text, self.width//2-140, 70)
         arcade.draw_rectangle_filled(self.player1.x, self.player1.y, 20, self.player1.height, arcade.color.YELLOW, 0)
         arcade.draw_rectangle_filled(self.player2.x, self.player2.y, 20, self.player2.height, arcade.color.BLUE, 0)
 
