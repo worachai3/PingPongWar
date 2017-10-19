@@ -3,8 +3,9 @@ import arcade.key
 from models import *
 
 BALL_SCALE = 1
-SCREEN_WIDTH = 1500
+SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
+END_SCORE = 5
 
 TIMER = 2
 
@@ -12,7 +13,10 @@ class GameWindow(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
 
+        self.started = False
         self.game_over = False
+        self.background = None
+        self.background = arcade.load_texture('images/background.jpg')
 
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -33,13 +37,29 @@ class GameWindow(arcade.Window):
     def on_draw(self):
         # Render the Screen
         arcade.start_render()
+        if not self.game_over:
+            arcade.draw_texture_rectangle(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
 
-        self.all_sprites_list.draw()
-        output = f"Player1: {self.world.player1.score}  Player2: {self.world.player2.score}"
-        self.score_text = arcade.create_text(output, arcade.color.WHITE,  14)
-        arcade.render_text(self. score_text, self.width//2-140, 70)
-        arcade.draw_rectangle_filled(self.player1.x, self.player1.y, 20, self.player1.height, arcade.color.YELLOW, 0)
-        arcade.draw_rectangle_filled(self.player2.x, self.player2.y, 20, self.player2.height, arcade.color.BLUE, 0)
+            self.all_sprites_list.draw()
+
+            if not self.started:
+                output = f"Press Spacebar to start"
+            else:
+
+                output = f"Player1: {self.world.player1.score}  Player2: {self.world.player2.score}"
+            self.score_text = arcade.create_text(output, arcade.color.BLACK,  14)
+            arcade.render_text(self. score_text, self.width//2-100, 100)
+            arcade.draw_rectangle_filled(self.player1.x, self.player1.y, 20, self.player1.height, arcade.color.RED, 0)
+            arcade.draw_rectangle_filled(self.player2.x, self.player2.y, 20, self.player2.height, arcade.color.BLUE, 0)
+
+        else:
+            if self.world.player1.score == END_SCORE:
+                output = f"Player 1 WIN {self.world.player1.score}:{self.world.player2.score}"
+            elif self.world.player2.score == END_SCORE:
+                output = f"Player 2 WIN {self.world.player1.score}:{self.world.player2.score}"
+            self.score_text = arcade.create_text(output, arcade.color.WHITE,  60)
+            arcade.render_text(self. score_text, self.width//2-100, 100)
+
 
     def on_key_release(self, key, key_modifiers):
         if key == arcade.key.W:
@@ -68,24 +88,38 @@ class GameWindow(arcade.Window):
             self.player2.accel = -1
         if key == arcade.key.DOWN and self.player2.con_potion:
             self.player2.accel = 1
+        if key == arcade.key.SPACE:
+            self.started = True
 
     def update(self, delta):
-        self.world.update(delta)
+        if not self.game_over and self.started:
+            self.world.update(delta)
 
-        # Draw all sprites
-        for items in self.all_sprites_list:
-            if items != None:
-                items.update(delta)
+            # Draw all sprites
+            for items in self.all_sprites_list:
+                if items != None:
+                    items.update(delta)
 
-        # Timer count
-        self.timer += delta
-        if self.timer <= TIMER:
-            return
+            # Timer count
+            self.timer += delta
+            if self.timer <= TIMER:
+                return
 
-        # Reset counter
-        self.timer = 0
-        if randint(1,10) <= 4:
-            self.all_sprites_list.append(self.world.spawn_potion())
+            # Reset counter
+            self.timer = 0
+            if randint(1,10) <= 4:
+                self.all_sprites_list.append(self.world.spawn_potion())
+
+            # Check game over
+            if self.player1.score == END_SCORE or self.player2.score == END_SCORE:
+                self.game_over = True
+        elif self.game_over:
+            self.remove_all_object()
+
+    def remove_all_object(self):
+            for items in self.all_sprites_list:
+                if items != None:
+                    items.kill()
 
 def main():
     window = GameWindow()

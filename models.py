@@ -49,6 +49,10 @@ class World:
         elif potion_type == 5:
             return Potions(self, potion_type, potion_list[potion_type], POTION_SCALE)
 
+    def restart(self):
+        self.player1.remove_buff()
+        self.player2.remove_buff()
+
 class Player:
     def __init__(self, world, x, y, extra_height, accel):
         self.world = world
@@ -149,6 +153,20 @@ class Player:
                 self.world.player2.con_potion = True
             elif self == self.world.player2:
                 self.world.player1.con_potion = True
+
+    def remove_buff(self):
+        self.speed = 7
+        self.extra_height = 0
+        self.sp_potion = False
+        self.sl_potion = False
+        self.p_potion = False
+        self.con_potion = False
+        self.sp_potion_time = 0
+        self.sl_potion_time = 0
+        self.con_potion_time = 0
+
+        self.hit_box_x = 10
+        self.hit_box_y = self.height//2
 
 class Potions(arcade.Sprite):
     def __init__(self, world, potion_type, image_file_name, scale):
@@ -267,13 +285,17 @@ class Ball(arcade.Sprite):
             if self.world.player2.score < 15:
                 print('Player1 Score: {}    Player2 Score: {}'.format(self.world.player1.score, self.world.player2.score))
                 self.respawn(2)
+                self.world.player1.remove_buff()
+                self.world.player2.remove_buff()
             else:
                 self.kill()
         if self.center_x+self.hit_box_x >= self.world.width:
             self.world.player1.score += 1
             if self.world.player1.score < 15:
-                self.respawn(1)
                 print('Player1 Score: {}    Player2 Score: {}'.format(self.world.player1.score, self.world.player2.score))
+                self.respawn(1)
+                self.world.player1.remove_buff()
+                self.world.player2.remove_buff()
             else:
                 self.kill()
 
@@ -284,7 +306,7 @@ class Ball(arcade.Sprite):
 
     def respawn(self, side):
         self.center_x = self.world.width//2
-        self.center_y = randint(0, self.world.height)
+        self.center_y = randint(20, self.world.height-20)
         self.speed = 6
         self.hit_box_x = Ball.HIT_BOX_X*self.scale
         self.hit_box_y = Ball.HIT_BOX_Y*self.scale
