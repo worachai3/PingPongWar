@@ -58,7 +58,7 @@ class Player:
         self.world = world
         self.x = x
         self.y = y
-        self.speed = 7
+        self.speed = 10
         self.extra_height = extra_height
         self.height = 100+self.extra_height
         self.score = 0
@@ -94,18 +94,18 @@ class Player:
                 self.sl_potion_time = 0
                 self.sp_potion = False
                 self.sl_potion = False
-                self.speed = 7
+                self.speed = 10
 
         # Sl potion effect
         if self.sl_potion:
             self.sl_potion_time += delta
-            self.speed = 3
+            self.speed = 6
             if self.sl_potion_time >= TIMER or self.sp_potion:
                 self.sp_potion_time = 0
                 self.sl_potion_time = 0
                 self.sp_potion = False
                 self.sl_potion = False
-                self.speed = 7
+                self.speed = 10
 
         # Con potion effect
         if self.con_potion:
@@ -155,7 +155,7 @@ class Player:
                 self.world.player1.con_potion = True
 
     def remove_buff(self):
-        self.speed = 7
+        self.speed = 10
         self.extra_height = 0
         self.sp_potion = False
         self.sl_potion = False
@@ -173,6 +173,9 @@ class Potions(arcade.Sprite):
         super().__init__(image_file_name, scale=scale)
         self.world = world
         self.potion_type = potion_type
+
+        # Another player chance
+        self.can_bounce = True
 
         # Set position
         self.center_x = self.world.width//2
@@ -225,9 +228,14 @@ class Potions(arcade.Sprite):
             self.world.player2.get_effect(self.potion_type)
             self.kill()
 
-        # Remove
         if self.center_x-self.hit_box_x <= 0 or self.center_x+self.hit_box_x >= self.world.width:
-            self.kill()
+        # Bounce (wall)
+            if self.can_bounce:
+                self.accel_x *= -1
+                self.can_bounce = False
+        # Remove
+            else:
+                self.kill()
 
         # Bounce (wall)
         if self.center_y-self.hit_box_y <= 0 or self.center_y+self.hit_box_y >= self.world.height:
@@ -281,23 +289,16 @@ class Ball(arcade.Sprite):
                 self.speed = 8
         # Out
         if self.center_x-self.hit_box_x <= 0:
+            self.respawn(2)
             self.world.player2.score += 1
-            if self.world.player2.score < 15:
-                print('Player1 Score: {}    Player2 Score: {}'.format(self.world.player1.score, self.world.player2.score))
-                self.respawn(2)
-                self.world.player1.remove_buff()
-                self.world.player2.remove_buff()
-            else:
-                self.kill()
+            self.world.player1.remove_buff()
+            self.world.player2.remove_buff()
+
         if self.center_x+self.hit_box_x >= self.world.width:
             self.world.player1.score += 1
-            if self.world.player1.score < 15:
-                print('Player1 Score: {}    Player2 Score: {}'.format(self.world.player1.score, self.world.player2.score))
-                self.respawn(1)
-                self.world.player1.remove_buff()
-                self.world.player2.remove_buff()
-            else:
-                self.kill()
+            self.respawn(1)
+            self.world.player1.remove_buff()
+            self.world.player2.remove_buff()
 
 
         # Bounce (wall)
