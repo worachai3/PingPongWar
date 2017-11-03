@@ -43,9 +43,9 @@ class GameWindow(arcade.Window):
 
             if not self.started:
                 show_tutorial = False
-                output = f"    Press Spacebar to start\nPress Enter to see potions list"
+                output = f"Press Spacebar to start"
                 self.score_text = arcade.create_text(output, arcade.color.BLACK,  14)
-                arcade.render_text(self. score_text, self.width//2-135, 115)
+                arcade.render_text(self. score_text, self.width//2-100, 100)
             else:
                 output = f"Player1: {self.world.player1.score}  Player2: {self.world.player2.score}"
                 self.score_text = arcade.create_text(output, arcade.color.BLACK,  14)
